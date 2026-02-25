@@ -55,6 +55,14 @@ if($extension_context!='') {
     $sth = $db->prepare($sql4);
     $sth->execute(array(':blindnum' => $blindnum));
     $blind_context = $sth->fetch(\PDO::FETCH_COLUMN);
+    if (empty($blind_context)) {
+            # Search for context in trunks
+            $sql5 = "SELECT data FROM pjsip where `keyword`='context' and `id` = (SELECT `id` FROM pjsip WHERE trunk_name = :blindnum)";
+            $sth = $db->prepare($sql5);
+            $sth->execute(array(':blindnum' => $blindnum));
+            $blind_context = $sth->fetch(\PDO::FETCH_COLUMN);
+    }
     @$agi->exec("Set", "xfer_context=$blind_context");
   }
 }
+
